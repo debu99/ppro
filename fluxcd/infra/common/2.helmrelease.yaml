@@ -20,8 +20,7 @@ spec:
     env:
       LOG_LEVEL: debug
       VAULT_ADDR: http://192.168.49.1:8200
-      DEFAULT_VAULT_MOUNT_POINT: ""
-      DEFAULT_VAULT_ROLE: ""
+      DEFAULT_VAULT_ROLE: "external-secret"
     resources:
       requests:
         cpu: 50m
