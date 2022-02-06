@@ -91,10 +91,10 @@ This repo is a demo of how to use drone CI and flux CD for a Nodejs app release
 | [fluxcd/dev/apps/nodejs/green](./fluxcd/dev/apps/nodejs/green) | Nodejs app green release template  |
 | [fluxcd/dev/apps/nodejs/ingress.yaml](./fluxcd/dev/apps/nodejs/ingress.yaml) | Ingress for nodejs app  |
 | [fluxcd/dev/apps/nodejs/kustomization.yaml](./fluxcd/dev/apps/nodejs/kustomization.yaml) | Kustomization installation file for nodejs app |
-| [fluxcd/prod/apps/nodejs/blue](./fluxcd/dev/prod/nodejs/blue) | Nodejs app blue release template  |
-| [fluxcd/prod/apps/nodejs/green](./fluxcd/dev/prod/nodejs/green) | Nodejs app green release template  |
-| [fluxcd/prod/apps/nodejs/ingress.yaml](./fluxcd/dev/prod/nodejs/ingress.yaml) | Ingress for nodejs app  |
-| [fluxcd/prod/apps/nodejs/kustomization.yaml](./fluxcd/dev/prod/nodejs/kustomization.yaml) | Kustomization installation file for nodejs app |
+| [fluxcd/prod/apps/nodejs/blue](./fluxcd/prod/apps/nodejs/blue) | Nodejs app blue release template  |
+| [fluxcd/prod/apps/nodejs/green](./fluxcd/prod/apps/nodejs/green) | Nodejs app green release template  |
+| [fluxcd/prod/apps/nodejs/ingress.yaml](./fluxcd/prod/apps/nodejs/ingress.yaml) | Ingress for nodejs app  |
+| [fluxcd/prod/apps/nodejs/kustomization.yaml](./fluxcd/prod/apps/nodejs/kustomization.yaml) | Kustomization installation file for nodejs app |
 
 ## Requirements
 | Name | Version |
