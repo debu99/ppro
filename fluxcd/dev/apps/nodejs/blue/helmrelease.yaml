@@ -19,7 +19,6 @@ spec:
       name: nodejs
       env: dev
       slot: blue
-      actualSlot: false
     image:
       replicas: "0"
       repo: docker-registry.registry:32080/nodejs

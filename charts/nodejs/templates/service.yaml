@@ -10,8 +10,6 @@ metadata:
     env: {{ .Values.app.env }}
     slot: {{ .Values.app.slot }}
     release: {{ .Release.Name }}
-  annotations:
-    actualSlot: "{{ .Values.app.actualSlot }}"
 spec:
   selector:
     app: {{ .Values.app.name }}

@@ -2,11 +2,11 @@
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
-  name: dev-nodejs-green
+  name: prod-nodejs-blue
 spec:
   interval: 1m0s
-  releaseName: dev-nodejs-green
-  targetNamespace: dev
+  releaseName: prod-nodejs-blue
+  targetNamespace: prod
   chart:
     spec:
       chart: ./charts/nodejs
@@ -17,10 +17,10 @@ spec:
   values:
     app:
       name: nodejs
-      env: dev
-      slot: green
+      env: prod
+      slot: blue
     image:
-      replicas: "1"
+      replicas: "0"
       repo: docker-registry.registry:32080/nodejs
       tag: latest
 
