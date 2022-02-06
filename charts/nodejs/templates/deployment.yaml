@@ -111,10 +111,10 @@ spec:
             port: {{ .Values.image.containerPort }}
             path: {{ .Values.image.readinessProbePath }}
           initialDelaySeconds: {{ .Values.image.initialDelaySeconds }}
-          timeoutSeconds: 20
-          periodSeconds: 10
-          successThreshold: 1
-          failureThreshold: 5
+          timeoutSeconds: 5
+          periodSeconds: 5
+          successThreshold: 2
+          failureThreshold: 3
         livenessProbe:
           httpGet:
             port: {{ .Values.image.containerPort }}
@@ -122,8 +122,8 @@ spec:
           initialDelaySeconds: {{ .Values.image.initialDelaySeconds }}
           timeoutSeconds: 5
           periodSeconds: 5
-          successThreshold: 1
-          failureThreshold: 5
+          successThreshold: 2
+          failureThreshold: 3
         {{- end }}
         resources:
         {{- toYaml .Values.image.resources | nindent 10 }}

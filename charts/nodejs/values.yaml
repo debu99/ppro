@@ -10,7 +10,7 @@ image:
   containerPort: 3000
   livenessProbePath: "/healthz"
   readinessProbePath: "/healthz"
-  initialDelaySeconds: 90
+  initialDelaySeconds: 5
 
   resources:
     requests:
