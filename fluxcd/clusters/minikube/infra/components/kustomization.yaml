@@ -4,4 +4,5 @@ resources:
   - ../../../../infra/components/external-secrets-crd
   - ../../../../infra/components/registry
   - ../../../../infra/components/drone
+  - ../../../../infra/components/drone-runner-kube
 patchesStrategicMerge: []
