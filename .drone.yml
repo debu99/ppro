@@ -12,7 +12,8 @@ steps:
     image: plugins/docker
     settings:
       registry: docker-registry.registry:32080
-      repo: nodejs
+      repo: docker-registry.registry:32080/nodejs
+      insecure: true
       context: nodejs
       dockerfile: nodejs/Dockerfile
       tags: ["${DRONE_COMMIT_SHA:0:7}", "latest"]
