@@ -9,8 +9,8 @@
   value: "green"
 - op: replace
   path: /spec/values/image/replicas
-  value: 0
+  value: "1"
 - op: replace
   path: /spec/values/image/tag
-  value: "41f4a7c"
-#yq e '(.[]|select(.path=="/spec/values/image/tag")|.value) = "123456"' -i op.yaml
+  value: "938611a"
+  #yq e '(.[]|select(.path=="/spec/values/image/tag")|.value) = "123456"' -i op.yaml
