@@ -15,3 +15,8 @@ steps:
       repo: nodejs
       dockerfile: ./nodejs/Dockerfile
       tags: ["${DRONE_COMMIT_SHA:0:7}", "latest"]
+    #environment:
+    #  USERNAME:
+    #    from_secret: username
+    #  PASSWORD:
+    #    from_secret: password
