@@ -43,4 +43,4 @@ spec:
     arbiter:
       enabled: false
     persistence:
-      enabled: false
+      enabled: true
