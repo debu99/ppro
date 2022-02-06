@@ -1,0 +1,17 @@
+kind: pipeline
+name: nodejs
+type: kubernetes
+
+resources:
+  requests:
+    cpu: 500
+    memory: 512MiB
+
+steps:
+  - name: docker
+    image: plugins/docker
+    settings:
+      registry: docker-registry.registry:32080
+      repo: nodejs
+      dockerfile: ./nodejs/Dockerfile
+      tags: ["${DRONE_COMMIT_SHA:0:7}", "latest"]

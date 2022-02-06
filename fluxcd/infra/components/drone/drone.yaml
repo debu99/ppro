@@ -8,6 +8,10 @@ metadata:
     app: drone
     release: drone
 data:
+  DRONE_LOGS_DEBUG: "false"
+  DRONE_LOGS_TRACE: "false"
+  DRONE_LOGS_PRETTY: "true"
+  DRONE_LOGS_COLOR: "true"
   DRONE_SERVER_HOST: "drone.devops"
   DRONE_SERVER_PROTO: "http"
 ---
