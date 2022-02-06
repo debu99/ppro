@@ -22,8 +22,7 @@ steps:
     #    from_secret: password
 
 trigger:
-  branch:
-    - master
   event:
-    - pull_request
-    - push
+  - cron
+  cron:
+  - minute
