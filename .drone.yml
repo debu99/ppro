@@ -26,3 +26,6 @@ trigger:
   branch:
   - master
   - main
+  event:
+  - push
+  - pull_request
