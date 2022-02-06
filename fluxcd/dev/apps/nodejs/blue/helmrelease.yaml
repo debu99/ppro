@@ -22,4 +22,4 @@ spec:
     image:
       replicas: "1"
       repo: docker-registry.registry:32080/nodejs
-      tag: c73f631
+      tag: 54f68d4
