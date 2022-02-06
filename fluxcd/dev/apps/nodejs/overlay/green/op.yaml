@@ -8,6 +8,9 @@
   path: /spec/values/app/slot
   value: "green"
 - op: replace
+  path: /spec/releaseName
+  value: "dev-nodejs-green"
+- op: replace
   path: /spec/values/image/replicas
   value: "1"
 - op: replace
