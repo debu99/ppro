@@ -20,3 +20,10 @@ steps:
     #    from_secret: username
     #  PASSWORD:
     #    from_secret: password
+
+trigger:
+  branch:
+    - master
+  event:
+    - pull_request
+    - push
