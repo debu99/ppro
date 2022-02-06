@@ -8,7 +8,7 @@ metadata:
     app: drone
     release: drone
 data:
-  DRONE_SERVER_HOST: "drone.local"
+  DRONE_SERVER_HOST: "drone.devops"
   DRONE_SERVER_PROTO: "http"
 ---
 apiVersion: v1
