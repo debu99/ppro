@@ -24,9 +24,6 @@ steps:
     #    from_secret: password
 
 trigger:
-  branch:
-  - master
-  - main
-  event:
-  - push
-  - pull_request
+  ref:
+  - refs/heads/main
+  - refs/heads/master
