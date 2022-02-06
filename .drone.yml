@@ -13,7 +13,8 @@ steps:
     settings:
       registry: docker-registry.registry:32080
       repo: nodejs
-      dockerfile: ./nodejs/Dockerfile
+      context: nodejs
+      dockerfile: nodejs/Dockerfile
       tags: ["${DRONE_COMMIT_SHA:0:7}", "latest"]
     #environment:
     #  USERNAME:
@@ -22,7 +23,6 @@ steps:
     #    from_secret: password
 
 trigger:
-  event:
-  - cron
-  cron:
-  - minute
+  branch:
+  - master
+  - main
