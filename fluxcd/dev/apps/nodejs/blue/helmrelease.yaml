@@ -20,7 +20,6 @@ spec:
       env: dev
       slot: blue
     image:
-      replicas: "0"
+      replicas: "1"
       repo: docker-registry.registry:32080/nodejs
-      tag: latest
-
+      tag: 58bffd4
