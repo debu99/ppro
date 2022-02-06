@@ -126,3 +126,9 @@ spec:
           envFrom:
             - configMapRef:
                 name: drone-runner-kube
+          env:
+            - name: DRONE_RPC_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: drone
+                  key: DRONE_RPC_SECRET
