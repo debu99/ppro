@@ -3,3 +3,4 @@
 [INFO] filename=helmrelease.yaml kustomization_name=dev-app-nodejs git_message=Update dev-nodejs-blue image tag to 58bffd4 from 58bffd4
 [INFO] filename=helmrelease.yaml kustomization_name=dev-app-nodejs git_message=Update dev-nodejs-blue image tag to c73f631 from 58bffd4
 [INFO] filename=helmrelease.yaml kustomization_name=dev-app-nodejs git_message=Update dev-nodejs-blue image tag to 54f68d4 from c73f631
+[INFO] filename=helmrelease.yaml kustomization_name=dev-app-nodejs git_message=Update dev-nodejs-blue image tag to 6aaff18 from 54f68d4
