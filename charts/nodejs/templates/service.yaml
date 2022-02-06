@@ -1,0 +1,31 @@
+---
+{{- $ServiceEnable := $.Values.service.enabled | default "true" }}
+{{- if eq $ServiceEnable "true" }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.app.env }}-{{ .Values.app.name }}-{{ .Values.app.slot }}
+  labels:
+    app: {{ .Values.app.name }}
+    env: {{ .Values.app.env }}
+    slot: {{ .Values.app.slot }}
+    release: {{ .Release.Name }}
+  annotations:
+    actualSlot: "{{ .Values.app.actualSlot }}"
+spec:
+  selector:
+    app: {{ .Values.app.name }}
+    env: {{ .Values.app.env }}
+    slot: {{ .Values.app.slot }}
+    release: {{ .Release.Name }}
+  type: {{ default "ClusterIP" .Values.service.type | quote }}  
+  ports:
+    - name: serviceport
+      port: {{ .Values.service.port }}
+      targetPort: {{ .Values.image.containerPort }}
+    {{- if ne .Values.service.port .Values.image.containerPort }}
+    - name: containerport
+      port: {{ .Values.image.containerPort }}
+      targetPort: {{ .Values.image.containerPort }}
+    {{- end }}
+{{- end }}

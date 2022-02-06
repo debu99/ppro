@@ -1,0 +1,20 @@
+{{- if .Values.image.pdbMinAvailable }}
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ .Values.app.env }}-{{ .Values.app.name }}-{{ .Values.app.slot }}
+  labels:
+    app: {{ .Values.app.name }}
+    env: {{ .Values.app.env }}
+    slot: {{ .Values.app.slot }}
+    release: {{ .Release.Name }}
+spec:
+  minAvailable: {{ .Values.image.pdbMinAvailable }}
+  selector:
+    matchLabels:
+      app: {{ .Values.app.name }}
+      env: {{ .Values.app.env }}
+      slot: {{ .Values.app.slot }}
+      release: {{ .Release.Name }}
+{{- end }}

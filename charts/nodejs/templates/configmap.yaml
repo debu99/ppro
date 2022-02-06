@@ -1,0 +1,17 @@
+{{- if eq .Values.configMaps.enabled "true" }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ $.Values.app.env }}-{{ $.Values.app.name }}-{{ $.Values.app.slot }}-configvolume
+  labels:
+    app: {{ $.Values.app.name }}
+    env: {{ $.Values.app.env }}
+    slot: {{ $.Values.app.slot }}
+    release: {{ $.Release.Name }}
+data:
+{{- range $filepath := .Values.configMaps.files }}
+  {{ $filepath|base }}:  |-
+{{ $.Files.Get ($filepath|base) | indent 4 }}
+{{- end -}}
+{{- end }}

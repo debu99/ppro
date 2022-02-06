@@ -1,0 +1,164 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.app.env }}-{{ .Values.app.name }}-{{ .Values.app.slot }}
+  labels:
+    app: {{ .Values.app.name }}
+    env: {{ .Values.app.env }}
+    slot: {{ .Values.app.slot }}
+    release: {{ .Release.Name }}
+spec:
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 50%
+      maxSurge: 100%
+  replicas: {{ .Values.image.replicas }}
+  selector:
+    matchLabels:
+      app: {{ .Values.app.name }}
+      env: {{ .Values.app.env }}
+      slot: {{ .Values.app.slot }}
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.app.name }}
+        env: {{ .Values.app.env }}
+        slot: {{ .Values.app.slot }}
+        release: {{ .Release.Name }}
+      {{- if eq .Values.prometheus.enabled "true" }}
+      annotations:
+        prometheus.io/scrape: {{ .Values.prometheus.enabled | quote }}
+        prometheus.io/path: {{ .Values.prometheus.url | quote }}
+        prometheus.io/port: {{ .Values.prometheus.port | quote }}
+      {{- end }}
+    spec:
+      {{- $affinity := .Values.image.affinity | default dict }}
+      {{- if $affinity.enabled }}
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchLabels:
+                  app: {{ .Values.app.name }}
+                  env: {{ .Values.app.env }}
+                  slot: {{ .Values.app.slot }}
+                  release: {{ .Release.Name }}
+              topologyKey: kubernetes.io/hostname
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app: {{ .Values.app.name }}
+                    env: {{ .Values.app.env }}
+                    slot: {{ .Values.app.slot }}
+                    release: {{ .Release.Name }}
+                topologyKey: topology.kubernetes.io/zone
+      {{- end }}
+      {{- $serviceAccountCreate := .Values.serviceAccount.create | default false }}
+      {{- if $serviceAccountCreate }}
+      serviceAccountName: {{ .Values.app.env }}-{{ .Values.app.name }}-{{ .Values.app.slot }}
+      {{- end }}
+      containers:
+      - name: {{ .Values.app.env }}-{{ .Values.app.name }}-{{ .Values.app.slot }}
+        image: "{{ .Values.image.repo }}:{{ .Values.image.tag }}"
+        imagePullPolicy: "{{ $.Values.image.imagePullPolicy }}"
+        env:
+        - name: K8S_POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: K8S_POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: K8S_POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        - name: K8S_NODE_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
+        - name: K8S_NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        - name: K8S_POD_CPU_REQUEST
+          valueFrom:
+            resourceFieldRef:
+              containerName: {{ .Values.app.env }}-{{ .Values.app.name }}-{{ .Values.app.slot }}
+              resource: requests.cpu
+        - name: K8S_POD_CPU_LIMIT
+          valueFrom:
+            resourceFieldRef:
+              containerName: {{ .Values.app.env }}-{{ .Values.app.name }}-{{ .Values.app.slot }}
+              resource: limits.cpu
+        - name: K8S_POD_MEM_REQUEST
+          valueFrom:
+            resourceFieldRef:
+              containerName: {{ .Values.app.env }}-{{ .Values.app.name }}-{{ .Values.app.slot }}
+              resource: requests.memory
+        - name: K8S_POD_MEM_LIMIT
+          valueFrom:
+            resourceFieldRef:
+              containerName: {{ .Values.app.env }}-{{ .Values.app.name }}-{{ .Values.app.slot }}
+              resource: limits.memory
+        - name: app_name
+          value: {{ .Values.app.name | quote }}
+        - name: app_env
+          value: {{ .Values.app.env | quote }}
+        - name: app_slot
+          value: {{ .Values.app.slot | quote }}
+        {{- if .Values.image.env }}
+        {{- range $key, $value := .Values.image.env }}
+        - name: {{ $key }}
+          value: {{ $value | quote }}
+        {{- end }}
+        {{- end }}
+        {{- if .Values.image.envSecret.enabled }}
+        envFrom:
+        - secretRef:
+            name: {{ .Values.app.env }}-{{ .Values.app.name }}
+        {{- end }}
+        ports:
+        - name: http
+          containerPort: {{ .Values.image.containerPort }}
+        {{- $healthCheckEnabled := hasKey .Values.image "healthCheckEnabled" | ternary .Values.image.healthCheckEnabled true }}
+        {{- if $healthCheckEnabled }}
+        readinessProbe:
+          httpGet:
+            port: {{ .Values.image.containerPort }}
+            path: {{ .Values.image.readinessProbePath }}
+          initialDelaySeconds: {{ .Values.image.initialDelaySeconds }}
+          timeoutSeconds: 20
+          periodSeconds: 10
+          successThreshold: 1
+          failureThreshold: 5
+        livenessProbe:
+          httpGet:
+            port: {{ .Values.image.containerPort }}
+            path: {{ .Values.image.livenessProbePath }}
+          initialDelaySeconds: {{ .Values.image.initialDelaySeconds }}
+          timeoutSeconds: 5
+          periodSeconds: 5
+          successThreshold: 1
+          failureThreshold: 5
+        {{- end }}
+        resources:
+        {{- toYaml .Values.image.resources | nindent 10 }}
+        {{- if eq .Values.configMaps.enabled "true" }}
+        volumeMounts:
+        - name: {{ $.Values.app.env }}-{{ $.Values.app.name }}-{{ $.Values.app.slot }}-configvolume
+          mountPath: {{ $.Values.configMaps.mountDir }}
+        {{- end }}
+      volumes:
+      {{- if eq $.Values.configMaps.enabled "true" }}
+      - name: {{ $.Values.app.env }}-{{ $.Values.app.name }}-{{ $.Values.app.slot }}-configvolume
+        configMap:
+          name: {{ $.Values.app.env }}-{{ $.Values.app.name }}-{{ $.Values.app.slot }}-configvolume
+      {{- end }}
+      restartPolicy: Always
