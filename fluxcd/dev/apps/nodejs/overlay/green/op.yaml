@@ -15,4 +15,4 @@
   value: "1"
 - op: replace
   path: /spec/values/image/tag
-  value: "41f4a7c"
+  value: "1b8e32c"

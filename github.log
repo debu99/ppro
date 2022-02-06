@@ -28,3 +28,4 @@
 [INFO] filename=helmrelease.yaml kustomization_name=dev-app-nodejs git_message=Scale down dev-nodejs-blue to 0
 [INFO] filename=op.yaml kustomization_name=dev-app-nodejs git_message=Update dev-nodejs-green image tag to 938611a from 41f4a7c
 [INFO] filename=op.yaml kustomization_name=dev-app-nodejs git_message=Update dev-nodejs-green image tag to 2bad89c from 938611a
+[INFO] filename=op.yaml kustomization_name=dev-app-nodejs git_message=Update dev-nodejs-green image tag to 1b8e32c from 41f4a7c
