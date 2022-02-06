@@ -62,8 +62,8 @@ This repo is a demo of how to use drone CI and flux CD for a Nodejs app release
 | File/Folder | Usage |
 | ------ | ------ |
 | [README.md](./README.md) | This file |
-| [.drone.yaml](./drone.yaml) | Drone CI pipeline to build the docker image |
-| [nodejs/Dockerfile](./nodejs/iam/main.tf) | Dockerfile for nodejs app |
+| [.drone.yaml](./.drone.yaml) | Drone CI pipeline to build the docker image |
+| [nodejs/Dockerfile](./nodejs/Dockerfile) | Dockerfile for nodejs app |
 | [nodejs/app.js](./nodejs/app.js) | Main function for nodejs app |
 | [nodejs/package.json](./nodejs/package.json) | Package info for nodejs app |
 | [charts/nodejs/templates](./charts/nodejs/templates) | Templates for nodejs app |
