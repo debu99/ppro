@@ -21,7 +21,7 @@ spec:
       slot: blue
       actualSlot: false
     image:
-      replicas: "1"
+      replicas: "0"
       repo: docker-registry.registry:32080/nodejs
       tag: latest
 
