@@ -24,6 +24,10 @@ spec:
     initdbScripts:
       init.js: |
         conn = new Mongo();
+        const username = _getEnv('MONGODB_ROOT_USER')
+        const password = _getEnv('MONGODB_ROOT_PASSWORD')
+        db = conn.getDB("admin");
+        db.auth(username, password)
         db = conn.getDB("testdb");
         db.testcol.insert({"str":"helloworld from db"});
         db.testcol.insert({"str":"2nd from db"});
