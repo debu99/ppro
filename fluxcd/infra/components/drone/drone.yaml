@@ -69,6 +69,22 @@ spec:
             limits:
               cpu: 100m
               memory: 128Mi
+          env:
+            - name: DRONE_GITHUB_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: drone
+                  key: DRONE_GITHUB_CLIENT_ID
+            - name: DRONE_GITHUB_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: drone
+                  key: DRONE_GITHUB_CLIENT_SECRET
+            - name: DRONE_RPC_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: drone
+                  key: DRONE_RPC_SECRET
           envFrom:
             - configMapRef:
                 name: drone
