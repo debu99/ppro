@@ -122,7 +122,7 @@ spec:
           initialDelaySeconds: {{ .Values.image.initialDelaySeconds }}
           timeoutSeconds: 5
           periodSeconds: 5
-          successThreshold: 2
+          successThreshold: 1
           failureThreshold: 3
         {{- end }}
         resources:
