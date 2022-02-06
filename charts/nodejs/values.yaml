@@ -1,6 +1,4 @@
 image:
-  affinity:
-    enabled: true
   pdbMinAvailable: 50%
   imagePullPolicy: "Always"
 

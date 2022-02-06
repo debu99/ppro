@@ -35,29 +35,6 @@ spec:
         prometheus.io/port: {{ .Values.prometheus.port | quote }}
       {{- end }}
     spec:
-      {{- $affinity := .Values.image.affinity | default dict }}
-      {{- if $affinity.enabled }}
-      affinity:
-        podAntiAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            - labelSelector:
-                matchLabels:
-                  app: {{ .Values.app.name }}
-                  env: {{ .Values.app.env }}
-                  slot: {{ .Values.app.slot }}
-                  release: {{ .Release.Name }}
-              topologyKey: kubernetes.io/hostname
-          preferredDuringSchedulingIgnoredDuringExecution:
-            - weight: 100
-              podAffinityTerm:
-                labelSelector:
-                  matchLabels:
-                    app: {{ .Values.app.name }}
-                    env: {{ .Values.app.env }}
-                    slot: {{ .Values.app.slot }}
-                    release: {{ .Release.Name }}
-                topologyKey: topology.kubernetes.io/zone
-      {{- end }}
       {{- $serviceAccountCreate := .Values.serviceAccount.create | default false }}
       {{- if $serviceAccountCreate }}
       serviceAccountName: {{ .Values.app.env }}-{{ .Values.app.name }}-{{ .Values.app.slot }}
