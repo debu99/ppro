@@ -56,7 +56,8 @@ This repo is a demo of how to use drone CI and flux CD for a Nodejs app release
         └───green
         └───ingress.yaml
         └───kustomization.yaml
-
+└───deployment
+    └───deploy.sh
 ```
 
 | File/Folder | Usage |
@@ -95,6 +96,7 @@ This repo is a demo of how to use drone CI and flux CD for a Nodejs app release
 | [fluxcd/prod/apps/nodejs/green](./fluxcd/prod/apps/nodejs/green) | Nodejs app green release template  |
 | [fluxcd/prod/apps/nodejs/ingress.yaml](./fluxcd/prod/apps/nodejs/ingress.yaml) | Ingress for nodejs app  |
 | [fluxcd/prod/apps/nodejs/kustomization.yaml](./fluxcd/prod/apps/nodejs/kustomization.yaml) | Kustomization installation file for nodejs app |
+| [deployment/deploy.sh](./deployment/deploy.sh) | Mock deployment script that can be used in the pipeline |
 
 ## Requirements
 | Name | Version |
@@ -198,10 +200,10 @@ flux reconcile kustomization flux-system
 Drone pipeline will build docker image from [nodejs folder](./nodejs) and tag with current commit id, then push to http://docker-registry.registry:32080/nodejs private docker registry repo in the local.
 
 - FluxCD(blue/green deployment):
-  1. Check current ingress backend service name color, increase the standby color pod replica to 1 and use the latest commit id tag for image, commit the changes to this repo
+  1. Check current ingress backend service color, increase the standby pod replica to 1 and use the latest commit id for image tag, commit the changes to this repo
   2. Reconcile the state with FluxCD, once the standby color pod is running, test its service with healthcheck url.
-  3. Update app ingress backend to the standby color service and then commit the changes to this repo, after that do another round of healthcheck on the real domain name to make sure the traffic has been switched successfully.
-  4. Scale down the previous color deployment replica to zero and commit the changes to this repo
+  3. Update app ingress backend to the standby service and then commit the changes to this repo, after that do another round of healthcheck on the real domain name to make sure the traffic has been switched successfully.
+  4. Scale down the previous color replica to zero and commit the changes to this repo
 
 ## How to test app access
 ```
