@@ -22,11 +22,3 @@ steps:
     #    from_secret: username
     #  PASSWORD:
     #    from_secret: password
-
-trigger:
-  branch:
-  - master
-  - main
-  event:
-  - push
-  - pull_request
