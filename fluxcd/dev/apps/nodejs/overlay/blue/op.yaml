@@ -1,0 +1,15 @@
+- op: replace
+  path: /spec/targetNamespace
+  value: "dev"
+- op: add
+  path: /spec/values/app/env
+  value: "dev"
+- op: add
+  path: /spec/values/app/slot
+  value: "blue"
+- op: replace
+  path: /spec/values/image/replicas
+  value: 1
+- op: replace
+  path: /spec/values/image/tag
+  value: "134"

@@ -1,0 +1,16 @@
+- op: replace
+  path: /spec/targetNamespace
+  value: "dev"
+- op: add
+  path: /spec/values/app/env
+  value: "dev"
+- op: add
+  path: /spec/values/app/slot
+  value: "green"
+- op: replace
+  path: /spec/values/image/replicas
+  value: 0
+- op: replace
+  path: /spec/values/image/tag
+  value: "41f4a7c"
+#yq e '(.[]|select(.path=="/spec/values/image/tag")|.value) = "123456"' -i op.yaml
