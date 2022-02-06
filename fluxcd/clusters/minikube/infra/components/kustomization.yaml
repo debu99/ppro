@@ -5,4 +5,5 @@ resources:
   - ../../../../infra/components/registry
   - ../../../../infra/components/drone
   - ../../../../infra/components/drone-runner-kube
+  - ../../../../infra/components/mongodb
 patchesStrategicMerge: []

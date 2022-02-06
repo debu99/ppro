@@ -1,0 +1,40 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: mongodb
+  namespace: db
+spec:
+  interval: 1m0s
+  releaseName: mongodb
+  targetNamespace: db
+  chart:
+    spec:
+      chart: mongodb
+      version: '11.0.3'
+      sourceRef:
+        kind: HelmRepository
+        name: bitnami
+  values:
+    fullnameOverride: "mongodb"
+    auth:
+      enabled: true
+      rootUser: root
+      existingSecret: mongodb
+    initdbScripts:
+      init.js: |
+        conn = new Mongo();
+        db = conn.getDB("testdb");
+        db.testcol.insert({"str":"helloworld from db"});
+        db.testcol.insert({"str":"2nd from db"});
+        db.testcol.insert({"str":"3rd from db"});
+        db.testcol.insert({"str":"4th from db"});
+    resources:
+      requests:
+        cpu: 50m
+        memory: 64Mi
+      limits:
+        cpu: 100m
+        memory: 128Mi
+    arbiter:
+      enabled: false
