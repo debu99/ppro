@@ -1,4 +1,4 @@
-{{- if .Values.image.pdbMinAvailable }}
+{{- if gt .Values.image.pdbMinAvailable 1.0 }}
 ---
 apiVersion: policy/v1
 kind: PodDisruptionBudget
