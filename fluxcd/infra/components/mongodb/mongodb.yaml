@@ -42,3 +42,5 @@ spec:
         memory: 128Mi
     arbiter:
       enabled: false
+    persistence:
+      enabled: false
