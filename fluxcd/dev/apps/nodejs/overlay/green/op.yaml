@@ -12,5 +12,5 @@
   value: "1"
 - op: replace
   path: /spec/values/image/tag
-  value: "938611a"
+  value: "2bad89c"
   #yq e '(.[]|select(.path=="/spec/values/image/tag")|.value) = "123456"' -i op.yaml
