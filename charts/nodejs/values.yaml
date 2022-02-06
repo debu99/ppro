@@ -1,7 +1,5 @@
 image:
-  pdbMinAvailable: 50%
   imagePullPolicy: "Always"
-
   replicas: 1
 
   envSecret:
