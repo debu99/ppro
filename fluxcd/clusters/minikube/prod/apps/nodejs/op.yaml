@@ -1,0 +1,12 @@
+- op: replace
+  path: /metadata/name
+  value: "prod-nodejs"
+- op: add
+  path: /metadata/labels/env
+  value: "prod"
+- op: replace
+  path: /spec/rules/0/host
+  value: "prod-nodejs.minikube.local"
+- op: replace
+  path: /spec/rules/0/http/paths/0/backend/service/name
+  value: "prod-nodejs-blue"

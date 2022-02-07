@@ -5,4 +5,8 @@ resources:
   - ./overlay/green/
   - ./ingress.yaml
 namespace: prod
-patches: []
+patches:
+  - path: op.yaml
+    target:
+      kind: Ingress
+      name: nodejs
