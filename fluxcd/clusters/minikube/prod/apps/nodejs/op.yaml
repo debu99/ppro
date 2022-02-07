@@ -9,4 +9,4 @@
   value: "prod-nodejs.minikube.local"
 - op: replace
   path: /spec/rules/0/http/paths/0/backend/service/name
-  value: "prod-nodejs-blue"
+  value: "prod-nodejs-green"
