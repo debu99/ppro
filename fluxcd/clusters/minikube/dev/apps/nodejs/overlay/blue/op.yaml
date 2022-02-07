@@ -12,7 +12,7 @@
   value: "dev-nodejs-blue"
 - op: replace
   path: /spec/values/image/replicas
-  value: "0"
+  value: "1"
 - op: replace
   path: /spec/values/image/tag
-  value: "9eb7a4e"
+  value: "0f1d021"
