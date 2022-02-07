@@ -1,4 +1,4 @@
-FROM alpine:3.15 as node
+FROM docker-registry.registry:32080/alpine:3.15
 
 ENV NODE_VERSION 16.13.2
 
