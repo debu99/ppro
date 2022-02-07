@@ -205,9 +205,17 @@ export GITHUB_USER=debu99
 export GITHUB_TOKEN=ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxx
 
 # Install flux into minikube and use this repo as source
+flux check --pre
 flux bootstrap github --owner=${GITHUB_USER} --repository=ppro --path=fluxcd/clusters/minikube/fluxcd --personal
 flux get all
 flux reconcile kustomization flux-system
+```
+
+- Push base image to local registry
+```
+docker pull alpine:3.15
+docker tag alpine:3.15 docker-registry.registry:32080/alpine:3.15
+docker push docker-registry.registry:32080/alpine:3.15
 ```
 
 ## GitOps flow
@@ -228,6 +236,7 @@ DNS_NAME='dev-nodejs.minikube.local'
 curl -i --header "Host: ${DNS_NAME}" http://`minikube ip`
 
 # For prod environment
+kubectl get pod,ingress -n prod
 DNS_NAME='prod-nodejs.minikube.local'
 curl -i --header "Host: ${DNS_NAME}" http://`minikube ip`
 ```
