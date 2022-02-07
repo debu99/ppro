@@ -1,0 +1,63 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: nginx-ingress
+spec:
+  interval: 1m0s
+  releaseName: nginx-ingress
+  chart:
+    spec:
+      chart: ingress-nginx
+      sourceRef:
+        kind: HelmRepository
+        name: ingress-nginx
+      version: '4.0.1'
+  values:
+    fullnameOverride: nginx-ingress
+    defaultBackend:
+      enabled: false
+    controller:
+      name: controller
+      kind: Deployment
+      replicaCount: 1
+      config:
+        use-forwarded-headers: "true"
+        compute-full-forwarded-for: "true"
+        #proxy-real-ip-cidr: "aaa.aaa.aaa.aaa/32,bbb.bbb.bbb.bbb/32,ccc.ccc.ccc.ccc/32,ddd.ddd.ddd.ddd/32"
+        use-geoip: "false"
+        use-geoip2: "false"
+        enable-underscores-in-headers: "true"
+        log-format-escape-json: "true"
+        log-format-upstream: '{ "@timestamp": "$time_iso8601", "remote_addr":
+            "$remote_addr", "x-forward-for": "$proxy_add_x_forwarded_for",
+            "request_id": "$req_id", "remote_user": "$remote_user", "body_bytes_sent":
+            "$body_bytes_sent", "request_time": "$request_time", "status": "$status",
+            "vhost": "$host", "request_proto": "$server_protocol", "request_uri": "$request_uri",
+            "request_query": "$args", "request_length": "$request_length",
+            "duration": "$request_time", "method": "$request_method", "http_referrer":
+            "$http_referer", "http_user_agent": "$http_user_agent" }'
+    updateStrategy:
+      type: RollingUpdate
+      rollingUpdate:
+        maxUnavailable: 1
+    affinity:
+      podAntiAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 100
+          podAffinityTerm:
+            labelSelector:
+              matchExpressions:
+              - key: app.kubernetes.io/name
+                operator: In
+                values:
+                - ingress-nginx
+              - key: app.kubernetes.io/instance
+                operator: In
+                values:
+                - nginx-ingress
+              - key: app.kubernetes.io/component
+                operator: In
+                values:
+                - controller
+            topologyKey: kubernetes.io/hostname
