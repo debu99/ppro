@@ -43,3 +43,4 @@
 [INFO] filename=op.yaml kustomization_name=dev-app-nodejs git_message=Scale down dev-nodejs-green to 0
 [INFO] filename=op.yaml kustomization_name=prod-app-nodejs git_message=Update prod-nodejs-blue image tag to 605d4bb from 9eb7a4e
 [INFO] filename=op.yaml kustomization_name=prod-app-nodejs git_message=Update prod-nodejs-green image tag to cbfd7bc from 8f0f5c4
+[INFO] filename=op.yaml kustomization_name=prod-app-nodejs git_message=Update prod-nodejs-green image tag to 3af63b6 from cbfd7bc
