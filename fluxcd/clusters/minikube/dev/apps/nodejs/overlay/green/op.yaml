@@ -12,7 +12,7 @@
   value: "dev-nodejs-green"
 - op: replace
   path: /spec/values/image/replicas
-  value: "1"
+  value: "0"
 - op: replace
   path: /spec/values/image/tag
   value: "3c17727"
