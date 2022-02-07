@@ -33,3 +33,4 @@
 [INFO] filename=ingress.yaml kustomization_name=dev-app-nodejs git_message=Update ingress with backend service name dev-nodejs-green
 [INFO] filename=op.yaml kustomization_name=dev-app-nodejs git_message=Scale down dev-nodejs-blue to 0
 [INFO] filename=op.yaml kustomization_name=dev-app-nodejs git_message=Update dev-nodejs-blue image tag to 9eb7a4e from 134
+[INFO] filename=ingress.yaml kustomization_name=dev-app-nodejs git_message=Update ingress with backend service name dev-nodejs-blue
