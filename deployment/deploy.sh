@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 GITHUB_USER=debu99
 GITHUB_TOKEN=ghp_XXXXXXXXXXXXXXXX
 GITHUB_REPO=github.com/debu99/ppro.git
@@ -7,9 +9,9 @@ GITHUB_REPO_NAME=ppro
 
 K8S_CLUSTER_NAME=minikube
 K8S_APP_NAME=nodejs
+K8S_POD_REPLICAS=1
 K8S_ENV_NAME=dev
 K8S_CLUSTER_NS=dev
-K8S_POD_REPLICAS=1
 K8S_APP_DNS='dev-nodejs.minikube.local'
 K8S_APP_DNS_IP='192.168.49.2'
 HELATHCHECK_URL='/healthz'
@@ -25,8 +27,9 @@ function git_add () {
   git add $filename
   pwd
   echo "[INFO] filename=$filename kustomization_name=$kustomization_name git_message=$git_message" >> $ROOT_PWD/$GITHUB_REPO_NAME/github.log
+  git status
   git add $ROOT_PWD/$GITHUB_REPO_NAME/github.log
-  git commit -m "[GITHUB_ACTION] ${git_message}" || true
+  git commit -m "[GitOps] ${git_message}" || true
   git push || true
   sleep 5
   flux reconcile kustomization $kustomization_name --verbose
@@ -91,8 +94,8 @@ function initGit() {
 
 function getSlot() {
   echo "[INFO] Get slot for ${K8S_APP_NAME}"
-  cd $ROOT_PWD/$GITHUB_REPO_NAME/fluxcd/${K8S_ENV_NAME}/apps/${K8S_APP_NAME}
-  CURRENT_SERVICE_NAME=`yq e '.spec.rules[0].http.paths[0].backend.service.name' ingress.yaml`
+  cd $ROOT_PWD/$GITHUB_REPO_NAME/fluxcd/clusters/${K8S_CLUSTER_NAME}/${K8S_ENV_NAME}/apps/${K8S_APP_NAME}
+  CURRENT_SERVICE_NAME=`yq e '.[]|select(.path=="/spec/rules/0/http/paths/0/backend/service/name")|.value' op.yaml` 
   if [[ $CURRENT_SERVICE_NAME == *"blue"* ]]; then
     echo "[INFO] Found blue slot is in-use ..."
     OLD_SERVICE_NAME=blue
@@ -110,25 +113,24 @@ function getSlot() {
 
 function updateStandby() {
   echo "[INFO] Start ${K8S_APP_NAME} ${NEW_SERVICE_NAME}"
-  cd $ROOT_PWD/$GITHUB_REPO_NAME/fluxcd/${K8S_ENV_NAME}/apps/${K8S_APP_NAME}/${NEW_SERVICE_NAME}
-  OLD_TAG=`yq e '.spec.values.image.tag' helmrelease.yaml`
+  cd $ROOT_PWD/$GITHUB_REPO_NAME/fluxcd/clusters/${K8S_CLUSTER_NAME}/${K8S_ENV_NAME}/apps/${K8S_APP_NAME}/overlay/${NEW_SERVICE_NAME}
+  OLD_TAG=`yq e '.[]|select(.path=="/spec/values/image/tag")|.value' op.yaml`
   echo "[INFO] OLD_TAG=${OLD_TAG} CURRENT_COMMIT=${CURRENT_COMMIT} ..."
   echo "[INFO] K8S_POD_REPLICAS=${K8S_POD_REPLICAS}"
-  yq e -i ".spec.values.image.tag = \"${CURRENT_COMMIT}\"" helmrelease.yaml
-  yq e -i ".spec.values.image.replicas = \"${K8S_POD_REPLICAS}\"" helmrelease.yaml
-  cat helmrelease.yaml
-  NEW_TAG=`yq e '.spec.values.image.tag' helmrelease.yaml`
-  NEW_DEPLOYMENT=`yq e '.spec.releaseName' helmrelease.yaml`
-  NEW_REPLICAS=`yq e '.spec.values.image.replicas' helmrelease.yaml`
-  echo "[INFO] NEW_DEPLOYMENT=$NEW_DEPLOYMENT NEW_TAG=$NEW_TAG NEW_REPLICAS=${NEW_REPLICAS}"
-  git_add helmrelease.yaml ${FLUX_KUSTOMIZATION_NAME} "Update ${NEW_DEPLOYMENT} image tag to ${NEW_TAG} from ${OLD_TAG}"
+  yq e -i '(.[]|select(.path=="/spec/values/image/tag")|.value) = "'${CURRENT_COMMIT}'"' op.yaml
+  yq e -i '(.[]|select(.path=="/spec/values/image/replicas")|.value) = "'${K8S_POD_REPLICAS}'"' op.yaml
+  cat op.yaml
+  NEW_TAG=`yq e '.[]|select(.path=="/spec/values/image/tag")|.value' op.yaml`
+  NEW_REPLICAS=`yq e '.[]|select(.path=="/spec/values/image/replicas")|.value' op.yaml`
+  echo "[INFO] NEW_DEPLOY_NAME=$NEW_DEPLOY_NAME NEW_TAG=$NEW_TAG NEW_REPLICAS=${NEW_REPLICAS}"
+  git_add op.yaml ${FLUX_KUSTOMIZATION_NAME} "Update ${NEW_DEPLOY_NAME} image tag to ${NEW_TAG} from ${OLD_TAG}"
 
   HEALTH_OK=0
   SLEEP_TIME=3
   TOTAL_TIME=90
   EXIT_NUM=$(((TOTAL_TIME+(SLEEP_TIME-1))/SLEEP_TIME))
   for (( i=0; i<=EXIT_NUM; i++ )); do
-    POD_NAME=`kubectl get pod -n ${K8S_CLUSTER_NS} | grep Running | grep ${NEW_DEPLOYMENT} | head -n1 | awk '{print $1}'` || true
+    POD_NAME=`kubectl get pod -n ${K8S_CLUSTER_NS} | grep Running | grep ${NEW_DEPLOY_NAME} | head -n1 | awk '{print $1}'` || true
     IMAGE_TAG=`kubectl get pod ${POD_NAME} -n ${K8S_CLUSTER_NS} -o json | jq -re '.spec.containers[].image' | awk -F':' '{print $NF}'` || true
     if [[ ${NEW_TAG} == ${IMAGE_TAG} ]]; then
       echo "[INFO] $i - NEW_TAG=${NEW_TAG} POD_NAME=${POD_NAME} IMAGE_TAG=${IMAGE_TAG}, continue to next step..."
@@ -139,7 +141,7 @@ function updateStandby() {
       sleep $SLEEP_TIME
     fi
   done
-  kubectl get pod -n ${K8S_CLUSTER_NS} | grep ${NEW_DEPLOYMENT}
+  kubectl get pod -n ${K8S_CLUSTER_NS} | grep ${NEW_DEPLOY_NAME}
   if [[ $HEALTH_OK -ne 1 ]]; then
     echo "[ERROR] Timeout: NEW_TAG=${NEW_TAG} POD_NAME=${POD_NAME} IMAGE_TAG=${IMAGE_TAG}"
     exit 1
@@ -147,32 +149,31 @@ function updateStandby() {
   check_health "${K8S_CLUSTER_NS}" "${NEW_DNS_NAME}" ${HELATHCHECK_URL}
 }
 
-
 function updateIngress() {
-  echo "[INFO] Update ingress traffic to ${NEW_DEPLOYMENT}"
-  cd $ROOT_PWD/$GITHUB_REPO_NAME/fluxcd/${K8S_ENV_NAME}/apps/${K8S_APP_NAME}/
-  yq e -i '.spec.rules[0].http.paths[0].backend.service.name  = "'"${NEW_DEPLOYMENT}"'"' ingress.yaml
-  BACKEND_NAME=`yq e '.spec.rules[0].http.paths[0].backend.service.name' ingress.yaml`
-  if [[ $BACKEND_NAME != ${NEW_DEPLOYMENT} ]]; then
-    echo "[ERROR] NEW_DEPLOYMENT=${NEW_DEPLOYMENT} BACKEND_NAME=${BACKEND_NAME}"
+  echo "[INFO] Update ingress traffic to ${NEW_DEPLOY_NAME}"
+  cd $ROOT_PWD/$GITHUB_REPO_NAME/fluxcd/clusters/${K8S_CLUSTER_NAME}/${K8S_ENV_NAME}/apps/${K8S_APP_NAME}/
+  yq e -i '(.[]|select(.path=="/spec/rules/0/http/paths/0/backend/service/name")|.value) = "'${NEW_DEPLOY_NAME}'"' op.yaml
+  BACKEND_NAME=`yq e '.[]|select(.path=="/spec/rules/0/http/paths/0/backend/service/name")|.value' op.yaml`
+  if [[ $BACKEND_NAME != ${NEW_DEPLOY_NAME} ]]; then
+    echo "[ERROR] NEW_DEPLOY_NAME=${NEW_DEPLOY_NAME} BACKEND_NAME=${BACKEND_NAME}"
     exit 1
   else
-    echo "[INFO] Ingress updated to ${NEW_DEPLOYMENT} ..."
+    echo "[INFO] Ingress updated to ${NEW_DEPLOY_NAME} ..."
   fi
-  git_add ingress.yaml ${FLUX_KUSTOMIZATION_NAME} "Update ingress with backend service name ${BACKEND_NAME}"
+  git_add op.yaml ${FLUX_KUSTOMIZATION_NAME} "Update ingress with backend service name ${BACKEND_NAME}"
   check_health ${K8S_CLUSTER_NS} ${K8S_APP_DNS} ${HELATHCHECK_URL}
 }
 
 function downScale() {
   echo "[INFO] Down scale ${OLD_SERVICE_NAME} to 0"
-  cd $ROOT_PWD/$GITHUB_REPO_NAME/fluxcd/${K8S_ENV_NAME}/apps/${K8S_APP_NAME}/${OLD_SERVICE_NAME}
-  CURRENT_NUM=`yq e '.spec.values.image.replicas' helmrelease.yaml`
+  cd $ROOT_PWD/$GITHUB_REPO_NAME/fluxcd/clusters/${K8S_CLUSTER_NAME}/${K8S_ENV_NAME}/apps/${K8S_APP_NAME}/overlay/${OLD_SERVICE_NAME}
+  CURRENT_NUM=`yq e '.[]|select(.path=="/spec/values/image/replicas")|.value' op.yaml`
   if [[ ! -z $CURRENT_NUM ]] && [[ $CURRENT_NUM -eq 0 ]]; then
       echo "[INFO] CURRENT_NUM = 0, skipping..."
   else
       echo "[INFO] CURRENT_NUM=${CURRENT_NUM}"
-      yq e -i '.spec.values.image.replicas = 0' helmrelease.yaml
-      git_add helmrelease.yaml ${FLUX_KUSTOMIZATION_NAME} "Scale down ${OLD_DEPLOY_NAME} to 0"
+      yq e -i '(.[]|select(.path=="/spec/values/image/replicas")|.value) = 0' op.yaml
+      git_add op.yaml ${FLUX_KUSTOMIZATION_NAME} "Scale down ${OLD_DEPLOY_NAME} to 0"
       HEALTH_OK=0
       SLEEP_TIME=3
       TOTAL_TIME=90

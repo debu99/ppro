@@ -23,6 +23,9 @@ This repo is a demo of how to use drone CI and flux CD for a Nodejs app release
         └───Chart.yaml
         └───values.yaml
 └───fluxcd
+    └───apps/nodejs/base
+        └───helmrelease.yaml
+        └───kustomization.yaml
     └───clusters/minikube
         └───fluxcd
             └───flux-system
@@ -32,8 +35,28 @@ This repo is a demo of how to use drone CI and flux CD for a Nodejs app release
             └───prod-app-nodejs.yaml
         └───infra/common/kustomization.yaml
         └───infra/components/kustomization.yaml
-        └───dev/apps/nodejs/kustomization.yaml
-        └───prod/apps/nodejs/kustomization.yaml
+        └───dev/apps/nodejs
+            └───overlay
+                └───blue
+                    └───kustomization.yaml
+                    └───op.yaml
+                └───green
+                    └───kustomization.yaml
+                    └───op.yaml
+            └───ingress.yaml
+            └───kustomization.yaml
+            └───op.yaml
+        └───prod/apps/nodejs
+            └───overlay
+                └───blue
+                    └───kustomization.yaml
+                    └───op.yaml
+                └───green
+                    └───kustomization.yaml
+                    └───op.yaml
+            └───ingress.yaml
+            └───kustomization.yaml
+            └───op.yaml
     └───infra
         └───common
             └───0.namespaces.yaml
@@ -46,16 +69,6 @@ This repo is a demo of how to use drone CI and flux CD for a Nodejs app release
             └───external-secrets-crd
             └───mongodb
             └───registry
-    └───dev/apps/nodejs
-        └───blue
-        └───green
-        └───ingress.yaml
-        └───kustomization.yaml
-    └───prod/apps/nodejs
-        └───blue
-        └───green
-        └───ingress.yaml
-        └───kustomization.yaml
 └───deployment
     └───deploy.sh
 ```
@@ -70,6 +83,8 @@ This repo is a demo of how to use drone CI and flux CD for a Nodejs app release
 | [charts/nodejs/templates](./charts/nodejs/templates) | Templates for nodejs app |
 | [charts/nodejs/Chart.yaml](./charts/nodejs/Chart.yaml) | Manifest file for nodejs chart |
 | [charts/nodejs/values.yaml](./charts/nodejs/values.yaml) | Default chart values for nodejs app |
+| [fluxcd/apps/nodejs/base/helmrelease.yaml](./fluxcd/apps/nodejs/base/helmrelease.yaml) | Base yaml for nodejs helmrelease |
+| [fluxcd/apps/nodejs/base/kustomization.yaml](./fluxcd/apps/nodejs/base/kustomization.yaml) | Kustomization config for base yaml |
 | [fluxcd/clusters/minikube/fluxcd/flux-system](./fluxcd/clusters/minikube/fluxcd/flux-system) | FluxCD configuration for cluster minikube |
 | [fluxcd/clusters/minikube/fluxcd/infra-common.yaml](./fluxcd/clusters/minikube/fluxcd/infra-common.yaml) | Dependent infra components for the K8s clusters that needs to deploy first |
 | [fluxcd/clusters/minikube/fluxcd/infra-components.yaml](./fluxcd/clusters/minikube/fluxcd/infra-components.yaml) | General infra components for all the K8s clusters |
@@ -77,8 +92,16 @@ This repo is a demo of how to use drone CI and flux CD for a Nodejs app release
 | [fluxcd/clusters/minikube/fluxcd/prod-app-nodejs.yaml](./fluxcd/clusters/minikube/fluxcd/prod-app-nodejs.yaml) | Nodejs app for prod environment |
 | [fluxcd/clusters/minikube/infra/common/kustomization.yaml](./fluxcd/clusters/minikube/infra/common/kustomization.yaml) | Kustomization file for infra component depencecies |
 | [fluxcd/clusters/minikube/infra/components/kustomization.yaml](./fluxcd/clusters/minikube/infra/components/kustomization.yaml) | Kustomization file for infra components |
-| [fluxcd/clusters/minikube/dev/apps/nodejs/kustomization.yaml](./fluxcd/clusters/minikube/dev/apps/nodejs/kustomization.yaml) | Kustomization file for dev nodejs app |
-| [fluxcd/clusters/minikube/prod/apps/nodejs/kustomization.yaml](./fluxcd/clusters/minikube/prod/apps/nodejs/kustomization.yaml) | Kustomization file for prod nodejs app |
+| [fluxcd/clusters/minikube/dev/apps/nodejs/overlay/blue](./fluxcd/clusters/minikube/dev/apps/nodejs/overlay/blue) | Nodejs app blue release template  |
+| [fluxcd/clusters/minikube/dev/apps/nodejs/overlay/green](./fluxcd/clusters/minikube/dev/apps/nodejs/overlay/green) | Nodejs app green release template  |
+| [fluxcd/clusters/minikube/dev/apps/nodejs/ingress.yaml](./fluxcd/clusters/minikube/dev/apps/nodejs/ingress.yaml) | Ingress template for nodejs app  |
+| [fluxcd/clusters/minikube/dev/apps/nodejs/op.yaml](./fluxcd/clusters/minikube/dev/apps/nodejs/op.yaml) | Ingress update for nodejs app  |
+| [fluxcd/clusters/minikube/dev/apps/nodejs/kustomization.yaml](./fluxcd/clusters/minikube/dev/apps/nodejs/kustomization.yaml) | Kustomization file for nodejs app |
+| [fluxcd/clusters/minikube/prod/apps/nodejs/overlay/blue](./fluxcd/clusters/minikube/prod/apps/nodejs/overlay/blue) | Nodejs app blue release template  |
+| [fluxcd/clusters/minikube/prod/apps/nodejs/overlay/green](./fluxcd/clusters/minikube/prod/apps/nodejs/overlay/green) | Nodejs app green release template  |
+| [fluxcd/clusters/minikube/prod/apps/nodejs/ingress.yaml](./fluxcd/clusters/minikube/prod/apps/nodejs/ingress.yaml) | Ingress template for nodejs app  |
+| [fluxcd/clusters/minikube/prod/apps/nodejs/op.yaml](./fluxcd/clusters/minikube/prod/apps/nodejs/op.yaml) | Ingress update for nodejs app  |
+| [fluxcd/clusters/minikube/prod/apps/nodejs/kustomization.yaml](./fluxcd/clusters/minikube/prod/apps/nodejs/kustomization.yaml) | Kustomization file for nodejs app |
 | [fluxcd/infra/common/0.namespaces.yaml](./fluxcd/infra/common/0.namespaces.yaml) | Create namespaces for K8s cluster |
 | [fluxcd/infra/common/1.helmrepository.yaml](./fluxcd/infra/common/1.helmrepository.yaml) | Add helm repos for K8s cluster |
 | [fluxcd/infra/common/2.helmrelease.yaml](./fluxcd/infra/common/2.helmrelease.yaml) | Helm install externalsecrets dependency for K8s cluster |
@@ -88,14 +111,6 @@ This repo is a demo of how to use drone CI and flux CD for a Nodejs app release
 | [fluxcd/infra/components/drone-runner-kube](./fluxcd/infra/components/drone-runner-kube) | Drone CI runner |
 | [fluxcd/infra/components/registry](./fluxcd/infra/components/registry) | Private docker registry |
 | [fluxcd/infra/components/mongodb](./fluxcd/infra/components/mongodb) | MongoDB database for nodejs app  |
-| [fluxcd/dev/apps/nodejs/blue](./fluxcd/dev/apps/nodejs/blue) | Nodejs app blue release template  |
-| [fluxcd/dev/apps/nodejs/green](./fluxcd/dev/apps/nodejs/green) | Nodejs app green release template  |
-| [fluxcd/dev/apps/nodejs/ingress.yaml](./fluxcd/dev/apps/nodejs/ingress.yaml) | Ingress for nodejs app  |
-| [fluxcd/dev/apps/nodejs/kustomization.yaml](./fluxcd/dev/apps/nodejs/kustomization.yaml) | Kustomization installation file for nodejs app |
-| [fluxcd/prod/apps/nodejs/blue](./fluxcd/prod/apps/nodejs/blue) | Nodejs app blue release template  |
-| [fluxcd/prod/apps/nodejs/green](./fluxcd/prod/apps/nodejs/green) | Nodejs app green release template  |
-| [fluxcd/prod/apps/nodejs/ingress.yaml](./fluxcd/prod/apps/nodejs/ingress.yaml) | Ingress for nodejs app  |
-| [fluxcd/prod/apps/nodejs/kustomization.yaml](./fluxcd/prod/apps/nodejs/kustomization.yaml) | Kustomization installation file for nodejs app |
 | [deployment/deploy.sh](./deployment/deploy.sh) | Mock deployment script that can be used in the pipeline |
 
 ## Requirements
