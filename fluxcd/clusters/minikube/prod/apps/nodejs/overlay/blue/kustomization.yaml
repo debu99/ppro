@@ -1,0 +1,11 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../../../../../../../apps/nodejs/base/
+namePrefix: prod-
+nameSuffix: -blue
+patches:
+  - path: op.yaml
+    target:
+      kind: HelmRelease
+      name: nodejs

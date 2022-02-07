@@ -1,21 +1,21 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: prod-nodejs
+  name: dev-nodejs
   labels:
     app: nodejs
-    env: prod
+    env: dev
   annotations:
     kubernetes.io/ingress.class: "nginx"
 spec:
   rules:
-    - host: "prod-nodejs.minikube.local"
+    - host: "dev-nodejs.minikube.local"
       http:
         paths:
           - path: /
             pathType: Prefix
             backend:
               service:
-                name: prod-nodejs-blue
+                name: dev-nodejs-green
                 port:
                   number: 80
